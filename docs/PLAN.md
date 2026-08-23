@@ -11,15 +11,44 @@ improved anything without a baseline number, and "I added verification and
 accuracy went from 61% to 89%" is the single most valuable sentence in the whole
 project. That sentence is only available if you measured *first*.
 
+## Billing
+
+The Anthropic API bills separately from any Claude subscription — it is
+pay-per-token against a payment method on console.anthropic.com. Check whether
+there is an org account you can get a key on before paying personally.
+
+Budget: roughly $0.20-0.30 per brief (Opus synthesis dominates; Haiku
+verification is ~$0.06), plus a per-search charge for the web search tool.
+With source caching in place the two weeks should land around $20-40. Without
+it, expect $150+ — almost entirely wasted on re-running searches you had
+already paid for. Use the Batch API for eval runs; they are not
+latency-sensitive and it is half price.
+
 ---
 
 ## Week 1 — make it work, and measure how badly
 
-**Days 1-2 — the spine.**
+**Days 1-2 — the spine, and source caching.**
 Get one competitor end-to-end: query in, draft brief out, using Claude with the
 `web_search_20260209` server tool. Ugly output is fine. Streamlit can wait; a
 script that prints to the terminal is the right scope. The only goal is a real
 brief from real sources.
+
+**Cache the raw sources to disk in this same step.** Write every fetched page to
+`runs/<company>/` before anything else touches it. This is not a nice-to-have and
+it is not a week-2 optimisation:
+
+- Eval runs replay from disk instead of re-searching and re-synthesising. A
+  25-row golden set run 15 times is ~375 briefs; uncached that is $100+, cached
+  it is close to free after the first pass.
+- Iterating on the verifier prompt is the single most repeated action in week 2.
+  Uncached, every iteration re-pays for search and synthesis you already did.
+- Fixed sources mean the eval measures *your changes*, not today's web. Without
+  caching, a score that moves might just be a search result that moved, and you
+  can't tell which.
+
+`verify_claim()` already takes `source_text` as an argument for exactly this
+reason — it never fetches anything itself, so it replays offline for free.
 
 **Day 3 — the golden set.**
 Expand `evals/golden_set.example.jsonl` from 5 rows to ~25. Pick companies you
