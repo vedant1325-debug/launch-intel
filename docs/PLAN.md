@@ -13,96 +13,114 @@ project. That sentence is only available if you measured *first*.
 
 ## Billing
 
-The Anthropic API bills separately from any Claude subscription — it is
-pay-per-token against a payment method on console.anthropic.com. Check whether
-there is an org account you can get a key on before paying personally.
+Gemini's free tier covers the models we need, and Google Search grounding
+includes 5,000 free requests per month (then $14/1,000). This project needs a few
+hundred. **Realistic expectation: $0**, or a few dollars if free-tier rate limits
+push you to paid.
 
-Budget: roughly $0.20-0.30 per brief (Opus synthesis dominates; Haiku
-verification is ~$0.06), plus a per-search charge for the web search tool.
-With source caching in place the two weeks should land around $20-40. Without
-it, expect $150+ — almost entirely wasted on re-running searches you had
-already paid for. Use the Batch API for eval runs; they are not
-latency-sensitive and it is half price.
+If you do go paid: `gemini-3.1-pro-preview` is $2.00/$12.00 per 1M tokens in/out,
+`gemini-3.1-flash-lite` is $0.25/$1.50. That 8x gap is the basis of the Day 12
+table. Get your own key from Google AI Studio rather than borrowing one — a key
+that gets rotated mid-project stalls you, and a portfolio piece shouldn't depend
+on credentials you don't control.
+
+Cache sources to disk regardless of cost. Free tiers have rate limits, and more
+importantly: if you re-search the web on every eval run, a score that moves might
+just be a search result that moved, and you can't tell which. Caching is about
+trustworthy measurement, not only money.
 
 ---
 
 ## Week 1 — make it work, and measure how badly
 
-**Days 1-2 — the spine, and source caching.**
-Get one competitor end-to-end: query in, draft brief out, using Claude with the
-`web_search_20260209` server tool. Ugly output is fine. Streamlit can wait; a
-script that prints to the terminal is the right scope. The only goal is a real
-brief from real sources.
+**Day 1 — Setup and first contact.**
+Create the virtualenv, install `requirements.txt`. Run `python src/verify.py --stub`
+(free, no key) to confirm the plumbing. Then put a Gemini key in `.env` and run
+`python src/verify.py` for real.
+*Success check:* two verdicts print — claim 1 `supported`, claim 2 `not_found`.
+If claim 2 comes back `supported`, the model is leaning on world knowledge
+instead of reading the source. That's your first real bug, and it's the exact
+failure this project exists to catch.
 
-**Cache the raw sources to disk in this same step.** Write every fetched page to
-`runs/<company>/` before anything else touches it. This is not a nice-to-have and
-it is not a week-2 optimisation:
+**Day 2 — First brief, and source caching.**
+Write `src/research.py`: company name in, `tools=[{"type": "google_search"}]` on,
+draft brief out. **Save every source page to `runs/<company>/` as you go, plus
+the `url_citation` annotations** — you need those on Day 6.
+*Success check:* a real brief about a real company prints; `runs/` has files.
 
-- Eval runs replay from disk instead of re-searching and re-synthesising. A
-  25-row golden set run 15 times is ~375 briefs; uncached that is $100+, cached
-  it is close to free after the first pass.
-- Iterating on the verifier prompt is the single most repeated action in week 2.
-  Uncached, every iteration re-pays for search and synthesis you already did.
-- Fixed sources mean the eval measures *your changes*, not today's web. Without
-  caching, a score that moves might just be a search result that moved, and you
-  can't tell which.
-
-`verify_claim()` already takes `source_text` as an argument for exactly this
-reason — it never fetches anything itself, so it replays offline for free.
-
-**Day 3 — the golden set.**
+**Days 3-4 — The test set. No code at all.**
 Expand `evals/golden_set.example.jsonl` from 5 rows to ~25. Pick companies you
 can independently verify: public pricing pages, real filings, launches you
-remember. Include 5-6 rows where the right answer is **refusal** — no reliable
-public data exists. Those rows are the point of the set, not filler.
+remember. Look up each answer yourself in a browser.
 
-**Day 4 — baseline.**
-Score the naive pipeline against the golden set. Metric: of the claims it makes,
-what fraction are actually supported by the source cited? Expect something
-between 55% and 70%. Write the number down. Resist the urge to fix anything
-today.
+**Include 5-6 rows where the right answer is "no reliable public data."** These
+are the most important rows, not filler. A system that confidently answers all
+25 should score *worse* than one answering 19 and declining 6.
 
-**Days 5-7 — claim extraction.**
-Stage 2: decompose a draft brief into atomic claims each bound to one source URL,
-using structured outputs (`client.messages.parse` with a Pydantic model). This is
-fiddly — one sentence often carries two claims, and vague sentences carry none.
-Getting the decomposition right is most of the work in this project.
+Highest-value work of the fortnight, and zero programming. Also the part most
+people skip — which is exactly why doing it makes you stand out.
+
+**Day 5 — Baseline.**
+Write `src/run_evals.py`: loop the 25 questions through the current unverified
+pipeline and count how many claims are genuinely supported by the source cited.
+Write the number down. Expect 55-70%.
+**Fix nothing today.** Resisting that is the whole point.
+
+**Days 6-7 — Claim extraction.**
+Write `src/extract.py`. Start from the `url_citation` annotations — Gemini gives
+you a rough claim-to-source binding for free — then clean them into atomic
+standalone claims with a Pydantic model.
+
+Expect several rounds. Annotated spans are not clean claims: they overlap, some
+cover half a sentence, some cover filler with nothing checkable in it, and some
+claims need the previous sentence to make sense. You're editing a rough draft
+rather than starting blank, but it still takes iteration.
+*Success check:* feed in a brief you know well; the claims list looks
+hand-checkable.
+
+**Day 8 — Buffer.**
+Freed up by the annotations doing part of Day 6's work. Use it to catch up or to
+strengthen the test set. Do **not** start new features.
 
 ---
 
 ## Week 2 — make it honest, and write it up
 
-**Days 8-9 — wire in the verifier.**
+**Days 9-10 — Wire in the verifier, then re-measure.**
 `src/verify.py` already implements stage 3. Connect extraction to it, run every
-claim through, and drop what doesn't survive. Then re-score against the golden
-set. This is the payoff moment: the delta between this number and day 4's is
-your headline result.
+claim through, drop what doesn't survive. Re-score against the golden set.
+**This is the payoff.** The gap between this number and Day 5's is your headline
+result. Record both carefully.
 
-**Day 10 — refusal and confidence.**
+**Day 11 — Refusal and confidence.**
 Add the thin-evidence path: when too few claims survive for a section, say so
 instead of padding. Surface the confidence badges. Verify the golden set's
-refusal rows now behave correctly — this is where most of the remaining eval
-score lives.
+refusal rows now behave correctly — much of your remaining score lives here.
 
-**Day 11 — cost and latency table.**
+**Day 12 — Cost and latency table.**
 Real numbers from `estimate_cost()`, not estimates. Per-brief cost, p50 latency,
-and the counterfactual: what an all-Opus pipeline would have cost. Then run the
-verifier once on Opus and once on Haiku across the golden set and show the
-accuracy difference is negligible. That table *is* the argument for the two-tier
-architecture — without it you just made a choice, with it you justified one.
+and the counterfactual: run verification once with `gemini-3.1-flash-lite` and
+once with `gemini-3.1-pro-preview`, and show the accuracy difference is
+negligible while the price gap is 8x.
 
-**Day 12 — Streamlit UI.**
-Only now. One input, one brief, badges and sources visible. Resist features.
+That table *is* the argument for the two-tier architecture. Without it you made a
+choice; with it you justified one.
 
-**Days 13-14 — the PM artifacts.**
+**Day 13 — Streamlit UI.**
+Only now. One input, one brief, badges and sources visible. ~20 lines. Resist
+features.
+
+**Day 14 — The PM artifacts.**
 - **PRD** (2 pages): the user, the job, what you deliberately cut and why.
-- **Eval report**: baseline vs. verified, the metric definition, and what still fails.
-- **Decision log**: 4-5 real tradeoffs with the reasoning. Two-tier models.
-  Refusal over coverage. Claim-level over document-level citation. Dropping
-  Firecrawl for server-side web tools.
-- **Known limitations**: written honestly. Interviewers probe here, and a
-  candidate who already knows the weak spots reads as senior. A candidate who
-  claims none reads as junior.
+- **Eval report**: baseline vs verified, the metric definition, what still fails.
+- **Decision log**: 4-5 real tradeoffs with reasoning. Cheap model for checking.
+  Refusal over coverage. Claim-level over document-level verification. Why
+  grounding annotations aren't sufficient on their own.
+- **Known limitations**, written honestly. Interviewers probe here, and a
+  candidate who already knows the weak spots reads as senior. One who claims
+  none reads as junior.
+
+Then make the repo public.
 
 ---
 
@@ -114,7 +132,7 @@ Things that will tempt you and should be cut:
 - Auth, accounts, saved history
 - The sentiment and metrics agents — land the competitor-analysis path first
 - PDF export
-- Any second LLM provider
+- A second LLM provider
 
 The project is judged on whether the claims it makes are true and whether you can
 explain your decisions. Nothing on that list moves either.
