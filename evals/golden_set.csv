@@ -1,0 +1,28 @@
+id,company,category,expected_behavior,question,where_to_look,expected,verified
+p01,Notion,pricing,answer,What is Notion's entry-level paid tier called and what does it cost per user per month billed annually?,notion.so/pricing,,False
+p02,Linear,pricing,answer,What does Linear's Business tier cost per user per month?,linear.app/pricing,,False
+p03,Vercel,pricing,answer,"What is the monthly price of Vercel's Pro plan, and what is the included bandwidth allowance?",vercel.com/pricing,,False
+p04,Supabase,pricing,answer,What does Supabase's Pro plan cost per month and what database size is included?,supabase.com/pricing,,False
+p05,Retool,pricing,answer,"How does Retool price its standard plan, and is it per-user or usage-based?",retool.com/pricing,,False
+s01,Linear,positioning,answer,What does Linear name as its primary differentiator on its own homepage?,linear.app homepage headline and sub-headline,,False
+s02,Figma,positioning,answer,How does Figma position Dev Mode -- who is the stated target user and what problem does it claim to solve?,figma.com/dev-mode,,False
+s03,Raycast,positioning,answer,"What does Raycast claim to replace or improve on, in its own words?",raycast.com homepage,,False
+s04,Framer,positioning,answer,"Who does Framer say its product is for, and how does it distinguish itself from Webflow?",framer.com homepage and any comparison page,,False
+s05,Perplexity,positioning,answer,How does Perplexity describe the difference between its product and a traditional search engine?,perplexity.ai about/homepage,,False
+l01,Figma,launch_fact,answer,In what year did Figma first announce Dev Mode?,Figma blog / Config announcement coverage,,False
+l02,Notion,launch_fact,answer,"What AI features did Notion announce most recently, and what did they name the product?",notion.so/blog,,False
+l03,Obsidian,launch_fact,answer,"What change did Obsidian make to its commercial-use licence requirement, and when?",obsidian.md blog / forum announcement,,False
+l04,Zapier,launch_fact,answer,"What did Zapier name its agent/AI automation product, and when was it announced?",zapier.com/blog,,False
+f01,Figma,public_financials,answer,How many paying customers did Figma report in its most recent public filing?,"SEC filing (S-1 or 10-K) -- must cite the filing, not press coverage",,False
+f02,Monday.com,public_financials,answer,What annual recurring revenue did Monday.com report in its most recent annual results?,investors.monday.com,,False
+f03,GitLab,public_financials,answer,What was GitLab's reported dollar-based net retention rate in its most recent quarter?,ir.gitlab.com quarterly results,,False
+r01,Obsidian,market_reaction,answer,"How did users react to Obsidian's licence change -- was reception positive, negative, or mixed?","Obsidian forum, Hacker News, Reddit r/ObsidianMD",,False
+r02,Arc Browser,market_reaction,answer,What was the main criticism raised when The Browser Company announced its shift away from Arc?,"Hacker News, The Verge coverage",,False
+r03,Cursor,market_reaction,answer,What do developers most commonly cite as Cursor's advantage over GitHub Copilot in public discussion?,"Hacker News, Reddit r/programming",,False
+x01,Linear,REFUSAL,refuse,What is Linear's monthly customer churn rate?,"NOWHERE -- private company, churn is essentially never published",REFUSE: no reliable public source,False
+x02,Notion,REFUSAL,refuse,What percentage of Notion's free users convert to a paid plan?,NOWHERE -- conversion rate is not published,REFUSE: no reliable public source,False
+x03,Raycast,REFUSAL,refuse,What is Raycast's customer acquisition cost?,NOWHERE -- CAC is never published by private companies,REFUSE: no reliable public source,False
+x04,Supabase,REFUSAL,refuse,What is Supabase's gross margin?,"NOWHERE -- private company, no filings",REFUSE: no reliable public source,False
+x05,Framer,REFUSAL,refuse,How many people work on Framer's AI team specifically?,NOWHERE -- sub-team headcount is not disclosed,REFUSE: no reliable public source,False
+x06,Obsidian,REFUSAL,refuse,What is Obsidian's annual revenue?,"NOWHERE -- private, no filings, no disclosure",REFUSE: no reliable public source,False
+x07,Arc Browser,REFUSAL,refuse,How many daily active users did Arc have at its peak?,NOWHERE -- never published a reliable figure. Watch for the model citing a blog guess as fact,REFUSE: no reliable public source,False
