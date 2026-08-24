@@ -43,6 +43,9 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
+import io
+
+import pypdf
 import requests
 from bs4 import BeautifulSoup
 from google import genai
@@ -217,6 +220,33 @@ def fetch(url: str, source_id: str) -> Source:
         src.error = f"{type(exc).__name__}: {exc}"
         return src
 
+    ctype = resp.headers.get("content-type", "").lower()
+
+    # PDFs must be handled before anything touches resp.text. Decoding PDF bytes
+    # as text yields 11k characters of binary sludge that BeautifulSoup happily
+    # accepts -- the fetch reports success and the model receives garbage as its
+    # source. A silent wrong answer is worse than a crash, so branch here.
+    if "application/pdf" in ctype or url.lower().split("?")[0].endswith(".pdf"):
+        try:
+            reader = pypdf.PdfReader(io.BytesIO(resp.content))
+            pages = [(pg.extract_text() or "") for pg in reader.pages]
+        except Exception as exc:
+            src.error = f"PDF parse failed: {type(exc).__name__}: {exc}"
+            return src
+
+        src.title = (reader.metadata or {}).get("/Title") or url
+        text = re.sub(r"\n{3,}", "\n\n", "\n\n".join(pages).strip())
+        if not text:
+            # Scanned filings are images of text. OCR is out of scope; say so
+            # rather than pass an empty source along as if it were usable.
+            src.error = f"PDF has no extractable text ({len(reader.pages)} pages, likely scanned)"
+            return src
+        if len(text) > MAX_CHARS:
+            text = text[:MAX_CHARS]
+            src.truncated = True
+        src.text = text
+        return src
+
     soup = BeautifulSoup(resp.text, "html.parser")
     # Strip the furniture before extracting text, or every page arrives as a pile
     # of nav links and cookie notices that crowd out the actual content.
@@ -225,6 +255,13 @@ def fetch(url: str, source_id: str) -> Source:
 
     src.title = (soup.title.get_text(strip=True) if soup.title else "") or url
     text = re.sub(r"\n{3,}", "\n\n", soup.get_text("\n", strip=True))
+
+    # Any other binary format (images, zip, docx) would also decode to noise.
+    # Cheap sanity check: real prose is overwhelmingly printable.
+    printable = sum(c.isprintable() or c.isspace() for c in text[:2000])
+    if text and printable / min(len(text), 2000) < 0.9:
+        src.error = f"content is not text (content-type: {ctype or 'unknown'})"
+        return src
 
     if len(text) > MAX_CHARS:
         text = text[:MAX_CHARS]
