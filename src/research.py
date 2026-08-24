@@ -46,6 +46,7 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 from google import genai
+from pydantic import BaseModel, Field
 
 # Reuse rather than redefine -- model choice, pricing and the cost helper live in
 # verify.py and must not drift between the two stages.
@@ -91,6 +92,42 @@ Rules that matter more than completeness:
   make it look complete.
 - No preamble, no description of what you are about to do, no closing summary.
   Start with the first section heading."""
+
+
+ANSWER_SYSTEM = """\
+You answer one question about a company using only the numbered sources given.
+
+You have no other information. If the sources do not state the answer, you do not
+know it -- and saying so is the correct, expected outcome, not a failure. Many
+questions have no answer in the sources by design.
+
+Set `answered` to true ONLY if a source actually states the answer. Not if it
+implies it, not if it feels likely, not if you happen to know it from elsewhere.
+
+Traps to refuse rather than guess:
+- A figure the sources never give, even if you could estimate it from what they do
+- A general claim you would be inferring from examples (customer logos are not a
+  statement about who the company targets)
+- Something stated about one product or tier, applied to another
+
+When answered is false, leave `answer` empty. Do not explain the company instead.
+When answered is true, keep the answer to one or two sentences and list every
+source id that supports it."""
+
+
+class SourcedAnswer(BaseModel):
+    """A question answered from the sources -- or explicitly not answered."""
+
+    answered: bool = Field(
+        description="True only if the sources actually state the answer."
+    )
+    answer: str = Field(
+        description="The answer, one or two sentences. Empty string if answered is false."
+    )
+    source_ids: list[str] = Field(
+        description="Source ids supporting the answer, e.g. ['S2']. Empty if not answered."
+    )
+    reasoning: str = Field(description="One sentence: why answered, or why not.")
 
 
 @dataclass
@@ -253,6 +290,89 @@ def write_brief(client, company: str, sources: list[Source], model: str = SYNTHE
     )
 
 
+def save_sources(company: str, sources: list[Source], root: Path = RUNS) -> Path:
+    """Cache the fetched pages on their own, independent of any brief.
+
+    Kept separate so the question mode can reuse pages without needing a brief to
+    have been written, and so re-asking questions costs no quota at all.
+    """
+    out = root / slug(company)
+    out.mkdir(parents=True, exist_ok=True)
+    path = out / "sources.json"
+    path.write_text(json.dumps([asdict(s) for s in sources], indent=2))
+    return path
+
+
+def load_cached_sources(company: str, root: Path = RUNS) -> list[Source] | None:
+    path = root / slug(company) / "sources.json"
+    if not path.exists():
+        return None
+    return [Source(**s) for s in json.loads(path.read_text())]
+
+
+def get_sources(company: str, urls: list[str] | None = None, refetch: bool = False) -> list[Source]:
+    """Fetched pages for a company, from cache when possible.
+
+    Cache-first is deliberate. Re-fetching costs time and free-tier quota, and --
+
+    more importantly -- changes the source text underneath an eval, which is
+    exactly what we gave up search grounding to avoid.
+    """
+    if not refetch:
+        cached = load_cached_sources(company)
+        if cached:
+            print(f"  (using {len(cached)} cached sources)")
+            return cached
+
+    urls = urls or load_source_urls(company)
+    print(f"  fetching {len(urls)} sources...")
+    sources = fetch_sources(urls)
+    save_sources(company, sources)
+    return sources
+
+
+def answer_question(
+    client,
+    company: str,
+    question: str,
+    sources: list[Source],
+    model: str = SYNTHESIS_MODEL,
+) -> tuple[SourcedAnswer, TokenUsage]:
+    """Answer one question from the sources, or refuse.
+
+    Structured output rather than prose, so `answered` is a machine-readable
+    signal. The eval runner needs to distinguish "refused" from "answered" without
+    grepping text for phrases like "not stated", which would be fragile and would
+    quietly miscount every time the model phrased a refusal differently.
+    """
+    usable = [s for s in sources if s.ok]
+    if not usable:
+        raise RuntimeError("No sources fetched successfully -- nothing to answer from.")
+
+    blocks = "\n\n".join(
+        f'<source id="{s.id}" url="{s.url}" title="{s.title}">\n{s.text}\n</source>'
+        for s in usable
+    )
+    interaction = client.interactions.create(
+        model=model,
+        system_instruction=ANSWER_SYSTEM,
+        input=f"Company: {company}\n\n{blocks}\n\nQuestion: {question}",
+        response_format={
+            "type": "text",
+            "mime_type": "application/json",
+            "schema": SourcedAnswer.model_json_schema(),
+        },
+    )
+    usage = getattr(interaction, "usage", None)
+    return (
+        SourcedAnswer.model_validate_json(interaction.output_text),
+        TokenUsage(
+            getattr(usage, "total_input_tokens", 0) or 0,
+            getattr(usage, "total_output_tokens", 0) or 0,
+        ),
+    )
+
+
 def save_brief(brief: Brief, root: Path = RUNS) -> Path:
     """Cache the brief and its full source text, so runs are replayable."""
     out = root / slug(brief.company)
@@ -285,16 +405,41 @@ if __name__ == "__main__":
     parser.add_argument("--url", action="append", default=[],
                         help="Extra source URL. Repeatable. Overrides sources.json if given.")
     parser.add_argument("--cached", action="store_true",
-                        help="Load the saved brief instead of re-fetching (free, instant).")
+                        help="Load the saved brief instead of re-writing it (free, instant).")
+    parser.add_argument("--question", "-q",
+                        help="Answer one question from the sources instead of writing a brief.")
+    parser.add_argument("--refetch", action="store_true",
+                        help="Re-download the pages even if cached copies exist.")
     args = parser.parse_args()
+
+    # Question mode: the path the eval runner exercises. Answers from the cached
+    # sources, or refuses -- and refusing is the right answer surprisingly often.
+    if args.question:
+        print(f"{args.company} — {args.question}\n")
+        sources = get_sources(args.company, args.url or None, refetch=args.refetch)
+        ans, usage = answer_question(genai.Client(), args.company, args.question, sources)
+        by_id = {s.id: s for s in sources}
+
+        if ans.answered:
+            print(f"ANSWERED   {ans.answer}")
+            for sid in ans.source_ids:
+                src = by_id.get(sid)
+                print(f"           {sid}  {src.url if src else '(unknown id)'}")
+        else:
+            print("REFUSED    not stated in the sources")
+        print(f"\nwhy: {ans.reasoning}")
+        print(
+            f"tokens: {usage.input_tokens} in / {usage.output_tokens} out"
+            f" | notional cost: ${estimate_cost(SYNTHESIS_MODEL, usage):.4f}"
+        )
+        raise SystemExit(0)
 
     if args.cached:
         brief = load_brief(args.company)
         print(f"(cached, written {brief.fetched_at})\n")
     else:
-        urls = args.url or load_source_urls(args.company)
-        print(f"Fetching {len(urls)} sources for {args.company}...")
-        sources = fetch_sources(urls)
+        print(f"Preparing sources for {args.company}...")
+        sources = get_sources(args.company, args.url or None, refetch=args.refetch)
         print("\nWriting brief...\n")
         brief = write_brief(genai.Client(), args.company, sources)
         print(f"(saved to {save_brief(brief)})\n")
