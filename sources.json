@@ -8,7 +8,8 @@
   "Notion": [
     "https://www.notion.com/",
     "https://www.notion.com/pricing",
-    "https://www.notion.com/blog"
+    "https://www.notion.com/blog",
+    "https://www.notion.com/en-gb/blog/building-shared-memory-for-ai-agents-in-notion"
   ],
   "Supabase": [
     "https://supabase.com/",
@@ -18,7 +19,8 @@
   "Figma": [
     "https://www.figma.com/dev-mode/",
     "https://www.figma.com/pricing/",
-    "https://www.figma.com/blog/"
+    "https://www.figma.com/blog/",
+    "https://www.figma.com/blog/introducing-dev-mode/"
   ],
   "Raycast": [
     "https://www.raycast.com/",
@@ -44,7 +46,8 @@
   ],
   "Zapier": [
     "https://zapier.com/agents",
-    "https://zapier.com/blog/"
+    "https://zapier.com/blog/",
+    "https://zapier.com/blog/introducing-zapier-ai-agents/"
   ],
   "Framer": [
     "https://www.framer.com/",
