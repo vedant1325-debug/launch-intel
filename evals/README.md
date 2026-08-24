@@ -32,17 +32,48 @@ stale, and a golden set seeded with half-remembered numbers means you are
 measuring against wrong answers without knowing it. Open the page, read it,
 write down what it says, and set `verified: true`.
 
-## The three numbers to report
+## Two failure modes that pull against each other
 
-One blended score hides too much. Report three.
+Measured on 2026-08-25, the system did both of these:
+
+**Fabrication** -- answering something the sources never state. This is the one
+the project was designed around.
+
+**False refusal** -- declining something the sources *do* state. Asked "who does
+Linear target as customers?", it refused, saying the sources don't state it --
+while source S1 reads "From ambitious startups to major enterprises." Wrong
+refusal, and the failure nobody plans for.
+
+These trade off directly. Tighten the prompt and fabrication falls while false
+refusals rise; loosen it and the reverse. **Where you set that threshold is the
+product decision this project exists to make**, and it is not a technical one:
+
+- A fabricated price reaching a board deck is severe and hard to catch.
+- A missing line is mild, visible, and the reader knows something is absent.
+
+So lean strict -- but not so strict the tool returns nothing and nobody uses it.
+Your job is to find that point with numbers rather than opinion, which means
+measuring both directions. A one-sided metric will make over-refusal look like
+success.
+
+## The numbers to report
+
+One blended score hides too much. Report these.
 
 **1. Citation accuracy** — on `expected_behavior: "answer"` rows.
 `supported claims / total claims asserted`. This is your headline. Baseline on
 Day 5, again on Day 10.
 
-**2. Refusal accuracy** — on the 7 `expected_behavior: "refuse"` rows.
-`correct refusals / 7`. Cheap to score: did it decline, or did it invent a
-figure? Nothing else to check.
+**2. Refusal accuracy** — on `expected_behavior: "refuse"` rows.
+`correct refusals / total refuse rows`. Cheap to score: did it decline, or did it
+invent a figure? Nothing else to check.
+
+**2b. False-refusal rate** — on `expected_behavior: "answer"` rows.
+`wrongly refused / total answer rows`. The mirror of the above, and the one that
+is easy to forget. A system scoring 100% on refusal accuracy while refusing half
+the answerable questions is not cautious, it is broken -- and only this number
+shows it. `--question` mode makes this trivial to score: `answered` is a boolean
+in the response, so no prose-matching is involved.
 
 **3. False-confidence rate** — across everything.
 `claims asserted at "high" confidence that turn out unsupported / all high-confidence claims`.
