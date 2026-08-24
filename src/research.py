@@ -118,6 +118,44 @@ When answered is true, keep the answer to one or two sentences and list every
 source id that supports it."""
 
 
+# Experimental variant, used by run_evals.py --prompt loose.
+#
+# The baseline refuses questions containing superlatives ("the primary
+# differentiator", "announced most recently") on the grounds that no page ranks
+# its features or orders its announcements. Literally true. The question is
+# whether that is careful or pedantic -- a human reading a homepage headline
+# would happily name the positioning it leads with.
+#
+# This variant permits answering from a clear, direct reading while still barring
+# invention. If it recovers those rows without fabricating on the seven
+# unanswerable ones, strictness was costing coverage for nothing. If fabrication
+# rises, we have located the actual tradeoff point -- which is the useful result
+# either way.
+ANSWER_SYSTEM_LOOSE = """\
+You answer one question about a company using only the numbered sources given.
+
+You have no other information. If the sources do not support an answer, say so --
+that is a correct outcome, not a failure, and many questions have no answer here.
+
+Answer when a source states the answer, or when it follows directly and
+unambiguously from what a source says. A homepage that leads with one claim is
+naming what it emphasises; a dated post is evidence of when something happened.
+You do not need the source to use the exact words of the question.
+
+Still refuse when answering would mean inventing:
+- A figure no source gives, even one you could estimate from what they do give
+- A generalisation drawn from examples (customer logos are not a statement about
+  who the company targets)
+- Something stated about one product or tier, applied to another
+- A ranking or ordering across sources that give you no basis to compare
+
+The line is direct reading versus guessing, not literal wording versus meaning.
+
+When answered is false, leave `answer` empty. Do not explain the company instead.
+When answered is true, keep the answer to one or two sentences and list every
+source id that supports it."""
+
+
 class SourcedAnswer(BaseModel):
     """A question answered from the sources -- or explicitly not answered."""
 
@@ -374,6 +412,7 @@ def answer_question(
     question: str,
     sources: list[Source],
     model: str = SYNTHESIS_MODEL,
+    system: str | None = None,
 ) -> tuple[SourcedAnswer, TokenUsage]:
     """Answer one question from the sources, or refuse.
 
@@ -392,7 +431,7 @@ def answer_question(
     )
     interaction = client.interactions.create(
         model=model,
-        system_instruction=ANSWER_SYSTEM,
+        system_instruction=system or ANSWER_SYSTEM,
         input=f"Company: {company}\n\n{blocks}\n\nQuestion: {question}",
         response_format={
             "type": "text",

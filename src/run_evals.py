@@ -36,7 +36,7 @@ from pathlib import Path
 from google import genai
 from pydantic import BaseModel, Field
 
-from research import answer_question, get_sources
+from research import ANSWER_SYSTEM, ANSWER_SYSTEM_LOOSE, answer_question, get_sources
 from verify import SYNTHESIS_MODEL, VERIFIER_MODEL, TokenUsage, estimate_cost
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -113,6 +113,8 @@ def main() -> None:
     # run exceeds. flash-lite has a workable allowance, so it is the default here.
     # Re-running with --model gemini-3.7-flash once quota resets gives the
     # cheap-vs-capable comparison the Day 12 table needs, on identical questions.
+    parser.add_argument("--prompt", choices=["strict", "loose"], default="strict",
+                        help="Which answering prompt to test.")
     parser.add_argument("--model", default=VERIFIER_MODEL,
                         help="Model to answer with. Default flash-lite (free-tier quota).")
     args = parser.parse_args()
@@ -127,6 +129,7 @@ def main() -> None:
         ans, usage = call_with_retry(
             answer_question, client, row["company"], row["question"], sources,
             model=args.model,
+            system=ANSWER_SYSTEM_LOOSE if args.prompt == "loose" else ANSWER_SYSTEM,
         )
         cost += estimate_cost(args.model, usage)
 
@@ -162,7 +165,7 @@ def main() -> None:
     fab = sum(r["fabrication"] for r in unanswerable)
 
     print("\n" + "=" * 58)
-    print(f"RESULTS -- {args.label}  ({args.model})")
+    print(f"RESULTS -- {args.label}  ({args.model}, {args.prompt} prompt)")
     print("=" * 58)
     print("\nTier 1 (objective)")
     print(f"  False refusal   {fr}/{len(answerable):<3} "
@@ -184,7 +187,7 @@ def main() -> None:
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     out = RESULTS / f"{args.label}-{stamp}.json"
     out.write_text(json.dumps(
-        {"label": args.label, "at": stamp, "model": args.model,
+        {"label": args.label, "at": stamp, "model": args.model, "prompt": args.prompt,
          "false_refusal": fr, "answerable": len(answerable),
          "fabrication": fab, "unanswerable": len(unanswerable),
          "results": results}, indent=2))
