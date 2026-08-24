@@ -1,5 +1,5 @@
 {
-  "_comment": "Which pages to read for each company. Fixed on purpose: the same sources every run means an eval score that moves is your work, not the web moving. Add a company by adding a key.",
+  "_comment": "Which pages to read for each company. Fixed on purpose: the same sources every run means an eval score that moves is your work, not the web moving. Every URL here was fetch-tested and returns real text -- check any new one with fetch() before trusting it, since JS-only sites return an empty shell that looks like a successful fetch.",
   "Linear": [
     "https://linear.app/",
     "https://linear.app/pricing",
@@ -14,5 +14,45 @@
     "https://supabase.com/",
     "https://supabase.com/pricing",
     "https://supabase.com/blog"
+  ],
+  "Figma": [
+    "https://www.figma.com/dev-mode/",
+    "https://www.figma.com/pricing/",
+    "https://www.figma.com/blog/"
+  ],
+  "Raycast": [
+    "https://www.raycast.com/",
+    "https://www.raycast.com/pricing"
+  ],
+  "Obsidian": [
+    "https://obsidian.md/",
+    "https://obsidian.md/pricing",
+    "https://obsidian.md/blog/"
+  ],
+  "Vercel": [
+    "https://vercel.com/pricing",
+    "https://vercel.com/"
+  ],
+  "Retool": [
+    "https://retool.com/pricing",
+    "https://retool.com/"
+  ],
+  "Perplexity": [
+    "https://www.perplexity.ai/hub",
+    "https://www.perplexity.ai/enterprise",
+    "https://en.wikipedia.org/wiki/Perplexity_AI"
+  ],
+  "Zapier": [
+    "https://zapier.com/agents",
+    "https://zapier.com/blog/"
+  ],
+  "Framer": [
+    "https://www.framer.com/",
+    "https://www.framer.com/pricing/"
+  ],
+  "Arc Browser": [
+    "https://arc.net/",
+    "https://arc.net/blog",
+    "https://en.wikipedia.org/wiki/Arc_(web_browser)"
   ]
 }
