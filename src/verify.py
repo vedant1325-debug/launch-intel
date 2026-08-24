@@ -31,8 +31,15 @@ Proving that claim with numbers is the Day 12 deliverable.
 from dataclasses import dataclass
 from typing import Literal
 
+from dotenv import load_dotenv
 from google import genai
 from pydantic import BaseModel, Field
+
+# genai.Client() reads GEMINI_API_KEY from the environment -- but a .env file is
+# not the environment until something loads it. Without this line the key sits in
+# .env unread and you get an auth error that never mentions .env, which is a
+# genuinely confusing twenty minutes.
+load_dotenv()
 
 # Per-million-token pricing, used by estimate_cost() for the Day 12 cost table.
 # Source: ai.google.dev/gemini-api/docs/pricing (checked 2026-08-23).
