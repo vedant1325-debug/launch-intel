@@ -54,9 +54,12 @@ PRICING = {
     "gemini-3.1-flash-lite": {"input": 0.25, "output": 1.50},
 }
 
-# gemini-3.1-pro-preview is a *preview* model and can change or be withdrawn.
-# If it starts misbehaving, gemini-3.7-flash is the stable fallback here.
-SYNTHESIS_MODEL = "gemini-3.1-pro-preview"
+# gemini-3.1-pro-preview is NOT available on the free tier -- it returns a 429
+# with `limit: 0`, which reads like a rate limit but means "not on your plan".
+# gemini-3.7-flash is free-tier eligible and is what we synthesise with. Switch
+# back to Pro only on a paid plan, and only if Flash proves inadequate -- which
+# is a question for the Day 12 comparison, not an assumption.
+SYNTHESIS_MODEL = "gemini-3.7-flash"
 VERIFIER_MODEL = "gemini-3.1-flash-lite"
 
 

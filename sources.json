@@ -1,0 +1,18 @@
+{
+  "_comment": "Which pages to read for each company. Fixed on purpose: the same sources every run means an eval score that moves is your work, not the web moving. Add a company by adding a key.",
+  "Linear": [
+    "https://linear.app/",
+    "https://linear.app/pricing",
+    "https://linear.app/changelog"
+  ],
+  "Notion": [
+    "https://www.notion.com/",
+    "https://www.notion.com/pricing",
+    "https://www.notion.com/blog"
+  ],
+  "Supabase": [
+    "https://supabase.com/",
+    "https://supabase.com/pricing",
+    "https://supabase.com/blog"
+  ]
+}
