@@ -26,6 +26,10 @@ Verification runs once per claim, so a 20-claim brief is 20 calls. Paying Pro
 rates to answer "is this sentence supported by this text?" is waste. Flash-Lite
 is 8x cheaper on both input and output and is entirely capable of the call.
 Proving that claim with numbers is the Day 12 deliverable.
+
+Measured 2026-08-24: ~$0.00017 per claim on Flash-Lite, so ~$0.0033 to verify a
+20-claim brief. Cheap enough that the interesting question at Day 12 is not cost
+but whether accuracy holds -- run the same claims through Pro and compare.
 """
 
 from dataclasses import dataclass
