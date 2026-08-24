@@ -3,7 +3,7 @@ p01,Notion,pricing,answer,What is Notion's entry-level paid tier called and what
 p02,Linear,pricing,answer,What does Linear's Business tier cost per user per month?,linear.app/pricing,16,True
 p03,Vercel,pricing,answer,"What is the monthly price of Vercel's Pro plan, and what is the included bandwidth allowance?",vercel.com/pricing,"$20, 1TB",True
 p04,Supabase,pricing,answer,What does Supabase's Pro plan cost per month and what database size is included?,supabase.com/pricing,"$25 , 8GB",True
-p05,Retool,pricing,answer,"How does Retool price its standard plan, and is it per-user or usage-based?",retool.com/pricing,"$10 per Builder + $5 per internal user, per user based",True
+p05,Retool,pricing,answer,"How does Retool price its standard plan, and is it per-user or usage-based?",retool.com/pricing,,FALSE
 s01,Linear,positioning,answer,What does Linear name as its primary differentiator on its own homepage?,linear.app homepage headline and sub-headline,"feature in Linear allows users to review, discuss, and merge code changes from both human developers and AI agents directly within the app using structural diffs.",True
 s02,Figma,positioning,answer,How does Figma position Dev Mode -- who is the stated target user and what problem does it claim to solve?,figma.com/dev-mode,"Target User: Developers and AI coding agents.
 Problem Solved: Closes the gap between design and code by pulling design context directly into IDEs, reducing meeting friction, and streamlining handoffs with a dedicated developer view.",True
@@ -14,7 +14,7 @@ l01,Figma,launch_fact,answer,In what year did Figma first announce Dev Mode?,Fig
 l02,Notion,launch_fact,answer,"What AI features did Notion announce most recently, and what did they name the product?",notion.so/blog,"Notion most recently announced a product named Lore.The AI feature is a shared, persistent memory system for AI agents (backed by Notion) that allows agents to record, store, and retrieve experiential knowledge, follow-up tasks, and decision records across different sessions and users.",True
 l03,Obsidian,launch_fact,answer,"What change did Obsidian make to its commercial-use licence requirement, and when?",obsidian.md blog / forum announcement,"They make the commercial License Optional, Anyone can use Obsidian for work, for free. February 2025",True
 l04,Zapier,launch_fact,answer,"What did Zapier name its agent/AI automation product, and when was it announced?",zapier.com/blog,Zapier Agents in January 2025,True
-f01,Figma,public_financials,answer,How many paying customers did Figma report in its most recent public filing?,"SEC filing (S-1 or 10-K) -- must cite the filing, not press coverage",8-K,True
+f01,Figma,public_financials,answer,How many paying customers did Figma report in its most recent public filing?,"SEC filing (S-1 or 10-K) -- must cite the filing, not press coverage",,FALSE
 f02,Monday.com,public_financials,answer,What annual recurring revenue did Monday.com report in its most recent annual results?,investors.monday.com,,FALSE
 f03,GitLab,public_financials,answer,What was GitLab's reported dollar-based net retention rate in its most recent quarter?,ir.gitlab.com quarterly results,,FALSE
 r01,Obsidian,market_reaction,answer,"How did users react to Obsidian's licence change -- was reception positive, negative, or mixed?","Obsidian forum, Hacker News, Reddit r/ObsidianMD",,FALSE
