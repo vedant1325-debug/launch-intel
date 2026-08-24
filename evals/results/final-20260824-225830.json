@@ -1,0 +1,280 @@
+{
+  "label": "final",
+  "at": "20260824-225830",
+  "model": "gemini-3.1-flash-lite",
+  "prompt": "default",
+  "false_refusal": 0,
+  "answerable": 10,
+  "fabrication": 0,
+  "unanswerable": 7,
+  "results": [
+    {
+      "id": "p01",
+      "company": "Notion",
+      "question": "What is Notion's entry-level paid tier called and what does it cost per user per month billed annually?",
+      "expected_behavior": "answer",
+      "expected": "Its called Plus, it cost $10",
+      "answered": true,
+      "answer": "Notion's entry-level paid tier is called the Plus plan, which costs $10 per member per month.",
+      "source_ids": [
+        "S2"
+      ],
+      "reasoning": "The Plus plan is identified as the first paid tier after the Free plan, and its cost is explicitly stated as $10 per member / month.",
+      "false_refusal": false,
+      "fabrication": false,
+      "judge": "match",
+      "judge_why": "The produced answer correctly identifies the tier as 'Plus' and the price as $10, which matches the information provided in the reference."
+    },
+    {
+      "id": "p02",
+      "company": "Linear",
+      "question": "What does Linear's Business tier cost per user per month?",
+      "expected_behavior": "answer",
+      "expected": "16",
+      "answered": true,
+      "answer": "Linear's Business tier costs $16 per user per month when billed yearly.",
+      "source_ids": [
+        "S2"
+      ],
+      "reasoning": "The pricing table in the source explicitly states the Business tier cost as $16 per user/month when billed yearly.",
+      "false_refusal": false,
+      "fabrication": false,
+      "judge": "match",
+      "judge_why": "The produced answer provides the correct numerical value while adding the billing context which is consistent with the reference."
+    },
+    {
+      "id": "p03",
+      "company": "Vercel",
+      "question": "What is the monthly price of Vercel's Pro plan, and what is the included bandwidth allowance?",
+      "expected_behavior": "answer",
+      "expected": "$20, 1TB",
+      "answered": true,
+      "answer": "The Vercel Pro plan costs $20 per month and includes 1 TB of fast data transfer per month.",
+      "source_ids": [
+        "S1"
+      ],
+      "reasoning": "Source S1 explicitly lists the Pro plan as $20/month and provides a table for Fast Data Transfer showing 1TB/month is included for the Pro plan.",
+      "false_refusal": false,
+      "fabrication": false,
+      "judge": "match",
+      "judge_why": "The produced answer correctly identifies both the $20 monthly price and the 1TB bandwidth allowance."
+    },
+    {
+      "id": "p04",
+      "company": "Supabase",
+      "question": "What does Supabase's Pro plan cost per month and what database size is included?",
+      "expected_behavior": "answer",
+      "expected": "$25 , 8GB",
+      "answered": true,
+      "answer": "The Pro plan starts at $25 per month and includes an 8 GB disk size per project.",
+      "source_ids": [
+        "S2"
+      ],
+      "reasoning": "The Pro plan's pricing and included database size are explicitly listed in the pricing table under the 'Pro' column.",
+      "false_refusal": false,
+      "fabrication": false,
+      "judge": "match",
+      "judge_why": "Both the price ($25) and the database size (8GB) match the reference answer."
+    },
+    {
+      "id": "s01",
+      "company": "Linear",
+      "question": "What does Linear name as its primary differentiator on its own homepage?",
+      "expected_behavior": "answer",
+      "expected": "Its headline positioning: \"the product development system for teams and agents\" - purpose-built for planning and building products, designed for the AI era. The page also frames it as a \"new species of product tool\" with \"AI workflows at its core\".",
+      "answered": true,
+      "answer": "Linear names its identity as a \"new species of product tool\" that is purpose-built for modern teams with AI workflows at its core as its primary differentiator.",
+      "source_ids": [
+        "S1"
+      ],
+      "reasoning": "The homepage explicitly introduces the platform as \"A new species of product tool\" and states it is \"Purpose-built for modern teams with AI workflows at its core\" to set a new standard.",
+      "false_refusal": false,
+      "fabrication": false,
+      "judge": "match",
+      "judge_why": "The produced answer captures the core components mentioned in the reference answer, specifically identifying the 'new species of product tool' branding and the focus on AI workflows."
+    },
+    {
+      "id": "s02",
+      "company": "Figma",
+      "question": "How does Figma position Dev Mode -- who is the stated target user and what problem does it claim to solve?",
+      "expected_behavior": "answer",
+      "expected": "Target User: Developers and AI coding agents.\nProblem Solved: Closes the gap between design and code by pulling design context directly into IDEs, reducing meeting friction, and streamlining handoffs with a dedicated developer view.",
+      "answered": true,
+      "answer": "Figma positions Dev Mode for developers as a dedicated workspace that bridges the gap between design and development. It aims to eliminate friction and inefficiency by allowing developers to inspect design files, extract implementation details like code snippets and measurements, and connect their design systems directly to their codebase.",
+      "source_ids": [
+        "S1",
+        "S4"
+      ],
+      "reasoning": "The sources explicitly identify developers as the primary audience for Dev Mode and state that its purpose is to bridge design and development, increase productivity, and provide necessary specs and context to developers.",
+      "false_refusal": false,
+      "fabrication": false,
+      "judge": "match",
+      "judge_why": "The produced answer covers the core target audience and the primary problem of bridging the design-to-development gap as described in the reference."
+    },
+    {
+      "id": "l01",
+      "company": "Figma",
+      "question": "In what year did Figma first announce Dev Mode?",
+      "expected_behavior": "answer",
+      "expected": "2023",
+      "answered": true,
+      "answer": "Figma first announced Dev Mode in 2023.",
+      "source_ids": [
+        "S4"
+      ],
+      "reasoning": "Source S4 explicitly states that Dev Mode was introduced on June 21, 2023.",
+      "false_refusal": false,
+      "fabrication": false,
+      "judge": "match",
+      "judge_why": "The produced answer correctly identifies 2023 as the year Dev Mode was announced."
+    },
+    {
+      "id": "l02",
+      "company": "Notion",
+      "question": "What AI features did Notion announce most recently, and what did they name the product?",
+      "expected_behavior": "answer",
+      "expected": "Notion most recently announced a product named Lore.The AI feature is a shared, persistent memory system for AI agents (backed by Notion) that allows agents to record, store, and retrieve experiential knowledge, follow-up tasks, and decision records across different sessions and users.",
+      "answered": true,
+      "answer": "Notion recently introduced 'Lore', a tool designed to provide shared, persistent memory for AI agents by using Notion as a backend.",
+      "source_ids": [
+        "S3",
+        "S4"
+      ],
+      "reasoning": "Source S3 and S4 both identify the recent announcement of Lore, describing it as a tool for shared memory for AI agents backed by Notion.",
+      "false_refusal": false,
+      "fabrication": false,
+      "judge": "match",
+      "judge_why": "The produced answer correctly identifies the product name 'Lore' and accurately describes its core function as a shared, persistent memory system for AI agents using Notion."
+    },
+    {
+      "id": "l03",
+      "company": "Obsidian",
+      "question": "What change did Obsidian make to its commercial-use licence requirement, and when?",
+      "expected_behavior": "answer",
+      "expected": "They make the commercial License Optional, Anyone can use Obsidian for work, for free.\u00a0February 2025",
+      "answered": true,
+      "answer": "As of February 20, 2025, Obsidian made the Commercial license optional, allowing anyone to use the app for work for free.",
+      "source_ids": [
+        "S3"
+      ],
+      "reasoning": "The blog post dated February 20, 2025, explicitly states that the Commercial license became optional on that date and that anyone can now use Obsidian for work for free.",
+      "false_refusal": false,
+      "fabrication": false,
+      "judge": "match",
+      "judge_why": "The produced answer correctly identifies the change and provides a specific date in February 2025 that is consistent with the reference answer."
+    },
+    {
+      "id": "l04",
+      "company": "Zapier",
+      "question": "What did Zapier name its agent/AI automation product, and when was it announced?",
+      "expected_behavior": "answer",
+      "expected": "Zapier Agents in January 2025",
+      "answered": true,
+      "answer": "Zapier named its agent/AI automation product Zapier Agents, which was announced on January 22, 2025.",
+      "source_ids": [
+        "S3"
+      ],
+      "reasoning": "The source explicitly states the name 'Zapier Agents' and provides the publication date of the announcement post as January 22, 2025.",
+      "false_refusal": false,
+      "fabrication": false,
+      "judge": "match",
+      "judge_why": "The produced answer contains the correct product name and date, with the specific date being consistent with the month mentioned in the reference."
+    },
+    {
+      "id": "x01",
+      "company": "Linear",
+      "question": "What is Linear's monthly customer churn rate?",
+      "expected_behavior": "refuse",
+      "expected": "REFUSE: no reliable public source",
+      "answered": false,
+      "answer": "",
+      "source_ids": [],
+      "reasoning": "None of the provided sources mention Linear's customer churn rate.",
+      "false_refusal": false,
+      "fabrication": false
+    },
+    {
+      "id": "x02",
+      "company": "Notion",
+      "question": "What percentage of Notion's free users convert to a paid plan?",
+      "expected_behavior": "refuse",
+      "expected": "REFUSE: no reliable public source",
+      "answered": false,
+      "answer": "",
+      "source_ids": [],
+      "reasoning": "The provided sources do not contain information about the conversion rate of Notion's free users to paid plans.",
+      "false_refusal": false,
+      "fabrication": false
+    },
+    {
+      "id": "x03",
+      "company": "Raycast",
+      "question": "What is Raycast's customer acquisition cost?",
+      "expected_behavior": "refuse",
+      "expected": "REFUSE: no reliable public source",
+      "answered": false,
+      "answer": "",
+      "source_ids": [],
+      "reasoning": "The provided sources do not contain information regarding Raycast's customer acquisition cost.",
+      "false_refusal": false,
+      "fabrication": false
+    },
+    {
+      "id": "x04",
+      "company": "Supabase",
+      "question": "What is Supabase's gross margin?",
+      "expected_behavior": "refuse",
+      "expected": "REFUSE: no reliable public source",
+      "answered": false,
+      "answer": "",
+      "source_ids": [],
+      "reasoning": "The provided sources describe Supabase's products, pricing, and company updates, but do not contain financial statements or data regarding the company's gross margin.",
+      "false_refusal": false,
+      "fabrication": false
+    },
+    {
+      "id": "x05",
+      "company": "Framer",
+      "question": "How many people work on Framer's AI team specifically?",
+      "expected_behavior": "refuse",
+      "expected": "REFUSE: no reliable public source",
+      "answered": false,
+      "answer": "",
+      "source_ids": [],
+      "reasoning": "The provided sources do not contain information regarding the number of employees on Framer's AI team.",
+      "false_refusal": false,
+      "fabrication": false
+    },
+    {
+      "id": "x06",
+      "company": "Obsidian",
+      "question": "What is Obsidian's annual revenue?",
+      "expected_behavior": "refuse",
+      "expected": "REFUSE: no reliable public source",
+      "answered": false,
+      "answer": "",
+      "source_ids": [],
+      "reasoning": "The provided sources do not contain information regarding Obsidian's annual revenue.",
+      "false_refusal": false,
+      "fabrication": false
+    },
+    {
+      "id": "x07",
+      "company": "Arc Browser",
+      "question": "How many daily active users did Arc have at its peak?",
+      "expected_behavior": "refuse",
+      "expected": "REFUSE: no reliable public source",
+      "answered": false,
+      "answer": "",
+      "source_ids": [],
+      "reasoning": "The provided sources do not contain information regarding the number of daily active users for the Arc browser.",
+      "false_refusal": false,
+      "fabrication": false
+    }
+  ],
+  "judged": {
+    "match": 10,
+    "partial": 0,
+    "mismatch": 0
+  }
+}

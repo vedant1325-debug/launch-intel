@@ -97,7 +97,7 @@ Rules that matter more than completeness:
   Start with the first section heading."""
 
 
-ANSWER_SYSTEM = """\
+ANSWER_SYSTEM_STRICT = """\
 You answer one question about a company using only the numbered sources given.
 
 You have no other information. If the sources do not state the answer, you do not
@@ -118,20 +118,25 @@ When answered is true, keep the answer to one or two sentences and list every
 source id that supports it."""
 
 
-# Experimental variant, used by run_evals.py --prompt loose.
+# The default answering prompt, chosen on evidence rather than instinct.
 #
-# The baseline refuses questions containing superlatives ("the primary
-# differentiator", "announced most recently") on the grounds that no page ranks
-# its features or orders its announcements. Literally true. The question is
-# whether that is careful or pedantic -- a human reading a homepage headline
-# would happily name the positioning it leads with.
+# ANSWER_SYSTEM_STRICT above refused any question containing a superlative -- "the
+# primary differentiator", "announced most recently" -- because no page ranks its
+# features or orders its announcements. Literally true, and it cost real coverage:
 #
-# This variant permits answering from a clear, direct reading while still barring
-# invention. If it recovers those rows without fabricating on the seven
-# unanswerable ones, strictness was costing coverage for nothing. If fabrication
-# rises, we have located the actual tradeoff point -- which is the useful result
-# either way.
-ANSWER_SYSTEM_LOOSE = """\
+#                     strict      this one
+#   correct           8/10 (80%)  9/10 (90%)
+#   false refusal     2/10 (20%)  0/10 (0%)
+#   fabrication       0/7  (0%)   0/7  (0%)
+#
+# Strictness bought no safety on this set -- fabrication stayed at zero either
+# way -- while costing two answerable rows. Hence the default.
+#
+# The line this draws is direct reading versus guessing, not literal wording
+# versus meaning. Keep ANSWER_SYSTEM_STRICT around: if a later change pushes
+# fabrication above zero, it is the fallback, and re-running against it is how
+# you show the tradeoff still holds.
+ANSWER_SYSTEM = """\
 You answer one question about a company using only the numbered sources given.
 
 You have no other information. If the sources do not support an answer, say so --

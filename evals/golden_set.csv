@@ -4,7 +4,7 @@ p02,Linear,pricing,answer,What does Linear's Business tier cost per user per mon
 p03,Vercel,pricing,answer,"What is the monthly price of Vercel's Pro plan, and what is the included bandwidth allowance?",vercel.com/pricing,"$20, 1TB",True
 p04,Supabase,pricing,answer,What does Supabase's Pro plan cost per month and what database size is included?,supabase.com/pricing,"$25 , 8GB",True
 p05,Retool,pricing,answer,"How does Retool price its standard plan, and is it per-user or usage-based?",retool.com/pricing,,FALSE
-s01,Linear,positioning,answer,What does Linear name as its primary differentiator on its own homepage?,linear.app homepage headline and sub-headline,"feature in Linear allows users to review, discuss, and merge code changes from both human developers and AI agents directly within the app using structural diffs.",True
+s01,Linear,positioning,answer,What does Linear name as its primary differentiator on its own homepage?,linear.app homepage headline and sub-headline,"Its headline positioning: ""the product development system for teams and agents"" - purpose-built for planning and building products, designed for the AI era. The page also frames it as a ""new species of product tool"" with ""AI workflows at its core"".",True
 s02,Figma,positioning,answer,How does Figma position Dev Mode -- who is the stated target user and what problem does it claim to solve?,figma.com/dev-mode,"Target User: Developers and AI coding agents.
 Problem Solved: Closes the gap between design and code by pulling design context directly into IDEs, reducing meeting friction, and streamlining handoffs with a dedicated developer view.",True
 s03,Raycast,positioning,answer,"What does Raycast claim to replace or improve on, in its own words?",raycast.com homepage,,FALSE
