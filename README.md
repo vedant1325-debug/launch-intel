@@ -19,18 +19,22 @@ doesn't read as wrong, it reads as research, and it ends up in a board deck.
 
 So this project treats *provable* as the product requirement, not *plausible*:
 
-| Stage | What happens |
-|---|---|
-| 1. Research | Gemini + Google Search grounding drafts a brief from public sources |
-| 2. Extract | The draft is decomposed into atomic claims, each bound to one source URL |
-| 3. Verify | Each claim is re-checked against its own source by a second, cheaper model |
-| 4. Assemble | Unsupported claims are dropped; survivors get confidence badges |
+| Stage | Where | What happens |
+|---|---|---|
+| 1. Research | `research.py` | Read a fixed list of public pages for the company |
+| 2. Draft | `research.py` | Write the brief, tagging every sentence with its source (`[S2]`) |
+| 3. Verify | `pipeline.py` → `verify.py` | Re-check each tagged claim against the source it cites |
+| 4. Assemble | `pipeline.py` | Drop unsupported claims; badge the rest by confidence |
+
+A separate **question mode** (`research.py -q`) answers a single question from the
+sources or refuses outright. It returns a structured `answered` boolean, which is
+what makes the eval scoreable without grepping prose for phrases like "not stated".
 
 Stage 3 is the whole point. A claim its own source doesn't support does not
 reach the reader. When too little survives, the brief says *"not enough public
 data on this competitor"* instead of inventing the rest.
 
-### Why grounding annotations aren't enough
+### Why a source tag isn't proof
 
 Gemini's search grounding returns `url_citation` annotations mapping spans of
 text to the URLs behind them, which looks like it already does stage 3. It
@@ -72,6 +76,22 @@ system that answers all 25 confidently scores *worse* than one that answers 19
 and declines 6, and the eval has to reflect that or it rewards exactly the
 failure mode this project exists to fix.
 
+## Results
+
+Measured over 19 golden-set questions (12 answerable, 7 with no public answer):
+
+| | |
+|---|---|
+| False refusal | **0%** — stable across 4 runs |
+| Fabrication | **0%** |
+| Answer correctness | **90%** |
+| Cost per brief | ~$0.01 |
+
+Full methodology, per-run variance, the model comparison, and nine stated
+limitations are in **[docs/EVAL_REPORT.md](docs/EVAL_REPORT.md)**. The reasoning
+behind each design choice — including two where measurement overturned the
+original assumption — is in **[docs/DECISIONS.md](docs/DECISIONS.md)**.
+
 ## Setup
 
 ```bash
@@ -81,8 +101,20 @@ pip install -r requirements.txt
 python src/verify.py --stub    # offline, no key, no cost -- verifies the wiring
 
 cp .env.example .env           # add your Gemini key, then:
-python src/verify.py           # the real thing
+streamlit run src/app.py       # the UI
 ```
+
+Other entry points:
+
+```bash
+python src/research.py "Linear"                      # draft a brief
+python src/research.py "Linear" -q "your question"   # answer from sources, or refuse
+python src/run_evals.py                              # score against the golden set
+python tools/judge_results.py "evals/results/*.json" # score answer correctness
+```
+
+`--cached` replays a saved brief for free; sources are cached to `runs/` after the
+first fetch, so re-running costs no quota.
 
 Get a free key from [Google AI Studio](https://aistudio.google.com/apikey). No
 second data provider is needed — web search runs as a Gemini tool call, so the
