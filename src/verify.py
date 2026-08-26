@@ -51,6 +51,7 @@ load_dotenv()
 PRICING = {
     "gemini-3.1-pro-preview": {"input": 2.00, "output": 12.00},
     "gemini-3.7-flash": {"input": 0.75, "output": 3.75},  # intro rate to 2026-12-31
+    "gemini-3.6-flash": {"input": 0.75, "output": 3.75},  # same intro rate as 3.7
     "gemini-3.1-flash-lite": {"input": 0.25, "output": 1.50},
 }
 

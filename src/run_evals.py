@@ -65,23 +65,35 @@ the same fact; $16 and $10 are not. If the reference is vague and the produced
 answer is specific and consistent with it, that is a match, not a partial."""
 
 
-def call_with_retry(fn, *args, attempts: int = 4, **kwargs):
-    """Free-tier rate limits are per-minute, so a 429 usually just means wait.
+# Errors worth retrying: the request never produced a result and might on a
+# second try. A 400 or a validation failure is not here on purpose -- retrying
+# those just burns quota against a request that will never succeed.
+TRANSIENT = ("429", "RESOURCE_EXHAUSTED", "Server disconnected",
+             "APIConnectionError", "500", "502", "503", "504", "timeout")
 
-    Retrying is not papering over a bug here -- a run of 19 questions back to
-    back will legitimately trip a per-minute cap partway through, and losing the
-    whole run to that would be worse than pausing.
+
+def call_with_retry(fn, *args, attempts: int = 4, **kwargs):
+    """Retry the transient failures a long eval run will legitimately hit.
+
+    Two kinds show up in practice. Free-tier rate limits are per-minute, so a
+    429 partway through a 17-question run just means wait. And the API
+    occasionally drops a connection without responding at all.
+
+    Neither is a bug being papered over -- losing a whole run (and the quota it
+    already spent) to one dropped connection is the worse outcome. There is no
+    checkpointing here, so a failure at question 15 costs all 15.
     """
     for i in range(attempts):
         try:
             return fn(*args, **kwargs)
         except Exception as exc:
-            if "429" not in str(exc) and "RESOURCE_EXHAUSTED" not in str(exc):
+            label = f"{type(exc).__name__}: {exc}"
+            if not any(t.lower() in label.lower() for t in TRANSIENT):
                 raise
             if i == attempts - 1:
                 raise
-            wait = 20 * (i + 1)
-            print(f"      rate limited, waiting {wait}s...")
+            wait = 15 * (i + 1)
+            print(f"      {type(exc).__name__}, waiting {wait}s...")
             time.sleep(wait)
 
 
